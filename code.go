@@ -150,24 +150,9 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	currentUsername := r.FormValue("username")
-	oldPassword := r.FormValue("old_password")
 	newUsername := r.FormValue("new_username")
 	newPassword := r.FormValue("new_password")
 
-	// Step 1: Check if username + old password match
-	var dbPassword string
-	err = db.QueryRow("SELECT password FROM users WHERE username = ?", currentUsername).Scan(&dbPassword)
-	if err != nil {
-		http.Error(w, "User not found", http.StatusNotFound)
-		return
-	}
-
-	if dbPassword != oldPassword {
-		http.Error(w, "Old password is incorrect", http.StatusUnauthorized)
-		return
-	}
-
-	// Step 2: Update username and password
 	stmt, err := db.Prepare("UPDATE users SET username = ?, password = ? WHERE username = ?")
 	if err != nil {
 		http.Error(w, "Database prepare error: "+err.Error(), http.StatusInternalServerError)
